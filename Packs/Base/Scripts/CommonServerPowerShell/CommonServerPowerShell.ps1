@@ -387,3 +387,71 @@ function ReturnOutputs([string]$ReadableOutput, [object]$Outputs, [object]$RawRe
     $demisto.Results($entry) | Out-Null
     return $entry
 }
+
+Function ConvertTo-Markdown{
+    [CmdletBinding()]
+    [OutputType([string])]
+    Param (
+        [Parameter(Mandatory = $true,Position = 0,ValueFromPipeline = $true)]
+        [AllowEmptyCollection()]
+        [PSObject[]]$collection,
+
+        [Parameter(Mandatory = $false,Position = 1)]
+        [String]$name
+    )
+    Begin {
+        # Initializing $result
+        $result = ''
+        if ($name) {
+            $result += "### $name`n"
+        }
+        # Initializing $items
+        $items = @()
+        # Initializing $headers
+        $headers = @()
+    }
+
+    Process {
+        # proccessing items and headers
+        ForEach ($item in $collection) {
+            $items += $item
+            }
+    }
+
+    End {
+        if ($items)
+        {
+            $item[0].PSObject.Properties| ForEach-Object {
+                $headers += $_.Name
+            }
+            # Writing the headers line
+            $result += $headers -join ' | '
+            $result += "`n"
+
+            # Writing the separator line
+            $separator = @()
+            ForEach ($key in $headers)
+            {
+                $separator += '---'
+            }
+            $result += $separator -join ' | '
+            $result += "`n"
+
+            # Writing the values
+            ForEach ($item in $items)
+            {
+                $values = @()
+                $item.PSObject.Properties | ForEach-Object {
+                    $values += $_.Value
+                }
+                $result += $values -join ' | '
+                $result += "`n"
+            }
+        }
+        else
+        {
+            $result += "**No entries.**`n"
+        }
+        $result
+    }
+}
