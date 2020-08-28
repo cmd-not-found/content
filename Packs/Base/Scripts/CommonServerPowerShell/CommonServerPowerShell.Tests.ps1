@@ -83,7 +83,7 @@ Describe 'Check-UtilityFunctions' {
             Assert-MockCalled -CommandName DemistoServerLog -Times 1 -ParameterFilter {$msg.Contains("Cannot parse the JSON")}
         }
     }
-    Context "ConvertTo-Markdown" {
+    Context "TableToMarkdown" {
         BeforeAll {
             $HashTableWithTwoEntries = @(
             @{
@@ -112,22 +112,25 @@ Describe 'Check-UtilityFunctions' {
             }
         }
         It "Empty list without a name" {
-            ConvertTo-Markdown @() | Should -Be "**No entries.**`n"
+            TableToMarkdown @() | Should -Be "**No entries.**`n"
         }
         It "A list with one element and no name" {
-            ConvertTo-Markdown $OneElementObject | Should -Be "Index | Name`n--- | ---`n0 | First element`n"
+            TableToMarkdown $OneElementObject | Should -Be "Name | Index`n--- | ---`nFirst element | 0`n"
         }
         It "A list with two elements and no name" {
-            ConvertTo-Markdown $TwoElementObject | Should -Be "Index | Name`n--- | ---`n0 | First element`n1 | Second element`n"
+            TableToMarkdown $TwoElementObject | Should -Be "Name | Index`n--- | ---`nFirst element | 0`nSecond element | 1`n"
         }
         It "Empty list with a name" {
-            ConvertTo-Markdown @() "Test Name" | Should -Be "### Test Name`n**No entries.**`n"
+            TableToMarkdown @() "Test Name" | Should -Be "### Test Name`n**No entries.**`n"
         }
         It "A list with two elements and a name" {
-            ConvertTo-Markdown $TwoElementObject "Test Name" | Should -Be "### Test Name`nIndex | Name`n--- | ---`n0 | First element`n1 | Second element`n"
+            TableToMarkdown $TwoElementObject "Test Name" | Should -Be "### Test Name`nName | Index`n--- | ---`nFirst element | 0`nSecond element | 1`n"
         }
         It "A list with one elements and a name" {
-            ConvertTo-Markdown $OneElementObject "Test Name" | Should -Be "### Test Name`nIndex | Name`n--- | ---`n0 | First element`n"
+            TableToMarkdown $OneElementObject "Test Name" | Should -Be "### Test Name`nName | Index`n--- | ---`nFirst element | 0`n"
+        }
+        It "Check alias to ConvertTo-Markdown" {
+            ConvertTo-Markdown @() "Test Name" | Should -Be "### Test Name`n**No entries.**`n"
         }
     }
 }

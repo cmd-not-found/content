@@ -388,7 +388,7 @@ function ReturnOutputs([string]$ReadableOutput, [object]$Outputs, [object]$RawRe
     return $entry
 }
 
-Function ConvertTo-Markdown{
+Function TableToMarkdown{
     [CmdletBinding()]
     [OutputType([string])]
     Param (
@@ -455,3 +455,4 @@ Function ConvertTo-Markdown{
         $result
     }
 }
+Set-Alias -Name ConvertTo-Markdown -Value TableToMarkdown
