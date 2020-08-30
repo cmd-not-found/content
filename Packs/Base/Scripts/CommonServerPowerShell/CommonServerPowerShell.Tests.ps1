@@ -86,17 +86,17 @@ Describe 'Check-UtilityFunctions' {
     Context "TableToMarkdown" {
         BeforeAll {
             $HashTableWithTwoEntries = @(
-            @{
+            [ordered]@{
                 Index = '0'
                 Name = 'First element'
             },
-            @{
+            [ordered]@{
                 Index = '1'
                 Name = 'Second element'
             }
             )
             $HashTableWithOneEntry = @(
-            @{
+            [ordered]@{
                 Index = '0'
                 Name = 'First element'
             })
@@ -115,19 +115,19 @@ Describe 'Check-UtilityFunctions' {
             TableToMarkdown @() | Should -Be "**No entries.**`n"
         }
         It "A list with one element and no name" {
-            TableToMarkdown $OneElementObject | Should -Be "Name | Index`n--- | ---`nFirst element | 0`n"
+            TableToMarkdown $OneElementObject | Should -Be "Index | Name`n--- | ---`n0 | First element`n"
         }
         It "A list with two elements and no name" {
-            TableToMarkdown $TwoElementObject | Should -Be "Name | Index`n--- | ---`nFirst element | 0`nSecond element | 1`n"
+            TableToMarkdown $TwoElementObject | Should -Be "Index | Name`n--- | ---`n0 | First element`n1 | Second element`n"
         }
         It "Empty list with a name" {
             TableToMarkdown @() "Test Name" | Should -Be "### Test Name`n**No entries.**`n"
         }
         It "A list with two elements and a name" {
-            TableToMarkdown $TwoElementObject "Test Name" | Should -Be "### Test Name`nName | Index`n--- | ---`nFirst element | 0`nSecond element | 1`n"
+            TableToMarkdown $TwoElementObject "Test Name" | Should -Be "### Test Name`nIndex | Name`n--- | ---`n0 | First element`n1 | Second element`n"
         }
         It "A list with one elements and a name" {
-            TableToMarkdown $OneElementObject "Test Name" | Should -Be "### Test Name`nName | Index`n--- | ---`nFirst element | 0`n"
+            TableToMarkdown $OneElementObject "Test Name" | Should -Be "### Test Name`nIndex | Name`n--- | ---`n0 | First element`n"
         }
         It "Check alias to ConvertTo-Markdown" {
             ConvertTo-Markdown @() "Test Name" | Should -Be "### Test Name`n**No entries.**`n"
