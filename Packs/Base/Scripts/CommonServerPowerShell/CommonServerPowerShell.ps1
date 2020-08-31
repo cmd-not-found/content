@@ -387,7 +387,47 @@ function ReturnOutputs([string]$ReadableOutput, [object]$Outputs, [object]$RawRe
     $demisto.Results($entry) | Out-Null
     return $entry
 }
+<#
+.DESCRIPTION
+This function Gets a string and escape all special characters in it so that it can be in correct markdown format
 
+.PARAMETER data
+The string that needs to be escaped
+
+.OUTPUTS
+A string in which all special characters are escaped
+#>
+Function stringEscapeMD(){
+    [OutputType([string])]
+    Param (
+        [Parameter(Mandatory = $true,Position = 0,ValueFromPipeline = $true)]
+        [String]$data
+    )
+    begin{
+        $markdown_chars = @('\', '`','*', '_', '{', '}', '[',']', '(', ')', '#', '+','-', '|', '!')
+    }
+    process {
+        $result = $data.Replace("`r`n", "<br>").Replace("`r", "<br>").Replace("`n", "<br>")
+        foreach ($char in $markdown_chars){
+            $result = $result.Replace("$char", "\$char")
+        }
+        $result
+    }
+}
+
+<#
+.DESCRIPTION
+This function Gets a list of PSObjects and convert it to a markdown table
+
+.PARAMETER collection
+The list of PSObjects that will should be converted to markdown format
+
+.PARAMETER name
+The name of the markdown table. when given this name will be the title of the table
+
+.OUTPUTS
+The markdown table string representation
+#>
 Function TableToMarkdown{
     [CmdletBinding()]
     [OutputType([string])]
@@ -442,7 +482,13 @@ Function TableToMarkdown{
             {
                 $values = @()
                 $item.PSObject.Properties | ForEach-Object {
-                    $values += $_.Value
+                if ($_.Value.GetType().Name -eq "String"){
+                    $value = $_.Value
+                }
+                else {
+                    $value = $_.Value | ConvertTo-Json
+                }
+                $values += $value | stringEscapeMD
                 }
                 $result += $values -join ' | '
                 $result += "`n"

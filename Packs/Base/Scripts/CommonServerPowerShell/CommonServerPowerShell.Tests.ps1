@@ -132,5 +132,14 @@ Describe 'Check-UtilityFunctions' {
         It "Check alias to ConvertTo-Markdown" {
             ConvertTo-Markdown @() "Test Name" | Should -Be "### Test Name`n**No entries.**`n"
         }
+        It "Check with nested objects" {
+            $TwoElementObject += New-Object PSObject -Property ([ordered]@{Index = "2"; Name = $HashTableWithOneEntry})
+            TableToMarkdown $TwoElementObject "Test Name" | Should -Be "### Test Name`nIndex | Name`n--- | ---`n0 | First element`n1 | Second element`n2 | \{<br>  `"Index`": `"0`",<br>  `"Name`": `"First element`"<br>\}`n"
+        }
+    }
+    Context "Test stringEscapeMD" {
+        It "Escaping special chars"{
+            '\ ` * _ { } [ ] ( ) # + - | ! `n `r `r`n' | stringEscapeMD | Should -Be '\\ \` \* \_ \{ \} \[ \] \( \) \# \+ \- \| \! \`n \`r \`r\`n'
+        }
     }
 }
