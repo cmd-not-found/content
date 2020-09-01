@@ -116,35 +116,35 @@ Describe 'Check-UtilityFunctions' {
             TableToMarkdown @() | Should -Be "**No entries.**`n"
         }
         It "A list with one element and no name" {
-            TableToMarkdown $OneElementObject | Should -Be "Index | Name`n--- | ---`n0 | First element`n"
+            TableToMarkdown $OneElementObject | Should -Be "| Index | Name`n| --- | ---`n| 0 | First element`n"
         }
         It "A list with two elements and no name" {
-            TableToMarkdown $TwoElementObject | Should -Be "Index | Name`n--- | ---`n0 | First element`n1 | Second element`n"
+            TableToMarkdown $TwoElementObject | Should -Be "| Index | Name`n| --- | ---`n| 0 | First element`n| 1 | Second element`n"
         }
         It "Empty list with a name" {
             TableToMarkdown @() "Test Name" | Should -Be "### Test Name`n**No entries.**`n"
         }
         It "A list with two elements and a name" {
-            TableToMarkdown $TwoElementObject "Test Name" | Should -Be "### Test Name`nIndex | Name`n--- | ---`n0 | First element`n1 | Second element`n"
+            TableToMarkdown $TwoElementObject "Test Name" | Should -Be "### Test Name`n| Index | Name`n| --- | ---`n| 0 | First element`n| 1 | Second element`n"
         }
         It "A list with one elements and a name" {
-            TableToMarkdown $OneElementObject "Test Name" | Should -Be "### Test Name`nIndex | Name`n--- | ---`n0 | First element`n"
+            TableToMarkdown $OneElementObject "Test Name" | Should -Be "### Test Name`n| Index | Name`n| --- | ---`n| 0 | First element`n"
         }
         It "Check alias to ConvertTo-Markdown" {
             ConvertTo-Markdown @() "Test Name" | Should -Be "### Test Name`n**No entries.**`n"
         }
         It "Check with nested objects" {
             $TwoElementObject += New-Object PSObject -Property ([ordered]@{Index = "2"; Name = $HashTableWithOneEntry})
-            TableToMarkdown $TwoElementObject "Test Name" | Should -Be "### Test Name`nIndex | Name`n--- | ---`n0 | First element`n1 | Second element`n2 | \{<br>  `"Index`": `"0`",<br>  `"Name`": `"First element`"<br>\}`n"
+            TableToMarkdown $TwoElementObject "Test Name" | Should -Be "### Test Name`n| Index | Name`n| --- | ---`n| 0 | First element`n| 1 | Second element`n| 2 | \{<br>  `"Index`": `"0`",<br>  `"Name`": `"First element`"<br>\}`n"
         }
         It "check with a single hashtable" {
-            $hashTable | TableToMarkdown | Should -Be "key1 | key2`n--- | ---`nvalue1 | value2`n"
+            $hashTable | TableToMarkdown | Should -Be "| key1 | key2`n| --- | ---`n| value1 | value2`n"
         }
         It "Check with a single PSObject" {
-            New-Object PSObject -Property $hashTable | TableToMarkdown | Should -Be "key1 | key2`n--- | ---`nvalue1 | value2`n"
+            New-Object PSObject -Property $hashTable | TableToMarkdown | Should -Be "| key1 | key2`n| --- | ---`n| value1 | value2`n"
         }
         It "Check with a list of hashtables"{
-             $HashTableWithOneEntry | TableToMarkdown | Should -Be "Index | Name`n--- | ---`n0 | First element`n"
+             $HashTableWithOneEntry | TableToMarkdown | Should -Be "| Index | Name`n| --- | ---`n| 0 | First element`n"
         }
         
     }

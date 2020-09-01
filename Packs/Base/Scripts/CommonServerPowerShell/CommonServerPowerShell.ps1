@@ -1,6 +1,6 @@
 . $PSScriptRoot\demistomock.ps1
 
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidGlobalVars", "", Scope = "", Justification = "Use of globals set by the Demisto Server")]
+#[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidGlobalVars", "", Scope = "", Justification = "Use of globals set by the Demisto Server")]
 
 # Silence Progress STDOUT (e.g. long http request download progress)
 $progressPreference = 'silentlyContinue'
@@ -468,7 +468,7 @@ Function TableToMarkdown{
                 $headers = $item[0].PSObject.Properties| ForEach-Object {$_.Name}
             }
             # Writing the headers line
-            $result += $headers -join ' | '
+            $result += '| ' + ($headers -join ' | ')
             $result += "`n"
 
             # Writing the separator line
@@ -477,7 +477,7 @@ Function TableToMarkdown{
             {
                 $separator += '---'
             }
-            $result += $separator -join ' | '
+            $result += '| ' + ($separator -join ' | ')
             $result += "`n"
 
             # Writing the values
@@ -504,7 +504,7 @@ Function TableToMarkdown{
                     }
                     $values += $value | stringEscapeMD
                 }
-                $result += $values -join ' | '
+                $result += '| ' + ($values -join ' | ')
                 $result += "`n"
             }
         }
