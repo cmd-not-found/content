@@ -110,6 +110,7 @@ Describe 'Check-UtilityFunctions' {
             {
                 $TwoElementObject += New-Object PSObject -Property $object
             }
+            $hashTable = [ordered]@{"key1" = "value1";"key2" = "value2"}
         }
         It "Empty list without a name" {
             TableToMarkdown @() | Should -Be "**No entries.**`n"
@@ -136,6 +137,16 @@ Describe 'Check-UtilityFunctions' {
             $TwoElementObject += New-Object PSObject -Property ([ordered]@{Index = "2"; Name = $HashTableWithOneEntry})
             TableToMarkdown $TwoElementObject "Test Name" | Should -Be "### Test Name`nIndex | Name`n--- | ---`n0 | First element`n1 | Second element`n2 | \{<br>  `"Index`": `"0`",<br>  `"Name`": `"First element`"<br>\}`n"
         }
+        It "check with a single hashtable" {
+            $hashTable | TableToMarkdown | Should -Be "key1 | key2`n--- | ---`nvalue1 | value2`n"
+        }
+        It "Check with a single PSObject" {
+            New-Object PSObject -Property $hashTable | TableToMarkdown | Should -Be "key1 | key2`n--- | ---`nvalue1 | value2`n"
+        }
+        It "Check with a list of hashtables"{
+             $HashTableWithOneEntry | TableToMarkdown | Should -Be "Index | Name`n--- | ---`n0 | First element`n"
+        }
+        
     }
     Context "Test stringEscapeMD" {
         It "Escaping special chars"{

@@ -434,7 +434,7 @@ Function TableToMarkdown{
     Param (
         [Parameter(Mandatory = $true,Position = 0,ValueFromPipeline = $true)]
         [AllowEmptyCollection()]
-        [PSObject[]]$collection,
+        [Object]$collection,
 
         [Parameter(Mandatory = $false,Position = 1)]
         [String]$name
@@ -457,12 +457,15 @@ Function TableToMarkdown{
             $items += $item
             }
     }
-
     End {
         if ($items)
         {
-            $item[0].PSObject.Properties| ForEach-Object {
-                $headers += $_.Name
+            if ($items[0] -is [System.Collections.IDictionary]){
+                $headers = $items[0].keys
+            }
+            else
+            {
+                $headers = $item[0].PSObject.Properties| ForEach-Object {$_.Name}
             }
             # Writing the headers line
             $result += $headers -join ' | '
@@ -481,14 +484,25 @@ Function TableToMarkdown{
             ForEach ($item in $items)
             {
                 $values = @()
-                $item.PSObject.Properties | ForEach-Object {
-                if ($_.Value.GetType().Name -eq "String"){
-                    $value = $_.Value
+                if ($items[0] -is [System.Collections.IDictionary])
+                {
+                    $raw_values = $item.values
                 }
-                else {
-                    $value = $_.Value | ConvertTo-Json
+                else
+                {
+                    $raw_values = $item[0].PSObject.Properties| ForEach-Object { $_.Value }
                 }
-                $values += $value | stringEscapeMD
+                foreach ($raw_value in $raw_values)
+                {
+                    if ($raw_value.GetType().Name -eq "String")
+                    {
+                        $value = $raw_value
+                    }
+                    else
+                    {
+                        $value = $raw_value | ConvertTo-Json
+                    }
+                    $values += $value | stringEscapeMD
                 }
                 $result += $values -join ' | '
                 $result += "`n"
