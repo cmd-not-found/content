@@ -512,7 +512,7 @@ Function TableToMarkdown{
         {
             $result += "**No entries.**`n"
         }
-        $result
+        return $result
     }
 }
 Set-Alias -Name ConvertTo-Markdown -Value TableToMarkdown
