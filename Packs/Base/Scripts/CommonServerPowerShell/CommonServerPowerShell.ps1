@@ -1,6 +1,6 @@
 . $PSScriptRoot\demistomock.ps1
 
-#[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidGlobalVars", "", Scope = "", Justification = "Use of globals set by the Demisto Server")]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidGlobalVars", "", Scope = "", Justification = "Use of globals set by the Demisto Server")]
 
 # Silence Progress STDOUT (e.g. long http request download progress)
 $progressPreference = 'silentlyContinue'
@@ -401,6 +401,7 @@ Function stringEscapeMD(){
     [OutputType([string])]
     Param (
         [Parameter(Mandatory = $true,Position = 0,ValueFromPipeline = $true)]
+        [AllowEmptyString()]
         [String]$data
     )
     begin{
@@ -414,7 +415,33 @@ Function stringEscapeMD(){
         $result
     }
 }
+<#
+.DESCRIPTION
+This function Converts a hashtable object into an ordered dictionary object
 
+.PARAMETER hashTable
+The hash-table that needs to be converted
+
+.OUTPUTS
+Ordered dict with the same keys and values as the hashTable's
+#>
+Function ConvertTo-OrderedDict {
+    [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+Param (
+        [Parameter(Mandatory = $true,Position = 0,ValueFromPipeline = $true)]
+        [AllowEmptyCollection()]
+        [HashTable]$hashTable
+    )
+Process {
+    $OrderedDictionary = [ordered]@{ }
+    foreach ($Element in ($hashTable.GetEnumerator() | Sort-Object -Property Key))
+    {
+        $OrderedDictionary[$Element.Key] = $Element.Value
+    }
+    return $OrderedDictionary
+}
+}
 <#
 .DESCRIPTION
 This function Gets a list of PSObjects and convert it to a markdown table
@@ -453,12 +480,18 @@ Function TableToMarkdown{
 
     Process {
         # proccessing items and headers
-        ForEach ($item in $collection) {
-            $items += $item
+        ForEach ($item in $collection)
+        {
+            if ($item -Is [HashTable])
+            {
+                # Need to convert hashtables to ordered dicts so that the keys/values will be in the same order
+                $item = $item | ConvertTo-OrderedDict
             }
+            $items += $item
+        }
     }
-    End {
-        if ($items)
+End {
+    if ($items)
         {
             if ($items[0] -is [System.Collections.IDictionary]){
                 $headers = $items[0].keys
@@ -494,13 +527,20 @@ Function TableToMarkdown{
                 }
                 foreach ($raw_value in $raw_values)
                 {
-                    if ($raw_value.GetType().Name -eq "String")
+                    if ($raw_value)
                     {
-                        $value = $raw_value
+                        if ($raw_value -Is [System.Array] -Or $raw_value -Is [Collections.IDictionary] -Or $raw_value -Is [PSCustomObject])
+                        {
+                            $value = $raw_value | ConvertTo-Json -Compress -Depth 5
+                        }
+                        else
+                        {
+                            $value = $raw_value.ToString()
+                        }
                     }
                     else
                     {
-                        $value = $raw_value | ConvertTo-Json
+                        $value = ""
                     }
                     $values += $value | stringEscapeMD
                 }
